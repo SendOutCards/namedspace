@@ -302,15 +302,15 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
     for arg_name in ("required_fields", "optional_fields", "mutable_fields"):
         arg_value = locals()[arg_name]
 
-        if isinstance(arg_value, basestring):
+        if isinstance(arg_value, str):
             arg_value = (arg_value,)
-            exec "{arg_name} = arg_value".format(arg_name=arg_name)
+            exec("{arg_name} = arg_value".format(arg_name=arg_name))
         elif not isinstance(arg_value, Container):
             raise ValueError("Value for argument '{arg_name}' must be a string or container of strings.".format(
                     arg_name=arg_name))
 
         for field_name in arg_value:
-            if not isinstance(field_name, basestring):
+            if not isinstance(field_name, str):
                 raise ValueError("Items of container argument '{arg_name}' must be strings.".format(arg_name=arg_name))
 
         if len(arg_value) != len(frozenset(arg_value)):
@@ -319,7 +319,7 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
 
         arg_list_items.append("{arg_name}={arg_value!r}".format(arg_name=arg_name, arg_value=tuple(arg_value)))
 
-        exec "{arg_name}_set = frozenset(arg_value)".format(arg_name=arg_name)
+        exec("{arg_name}_set = frozenset(arg_value)".format(arg_name=arg_name))
 
     all_fields = tuple(required_fields + optional_fields)
 
@@ -338,7 +338,7 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
         if not isinstance(arg_value, Mapping):
             raise ValueError("Value for argument '{arg_name}' must be a mapping.".format(arg_name=arg_name))
 
-        default_field_names = frozenset(arg_value.iterkeys())
+        default_field_names = frozenset(iter(arg_value.keys()))
         if not default_field_names.issubset(all_fields_set):
             bad_default_field_names = default_field_names - all_fields_set
             raise ValueError("Value for argument '{arg_name}' contains invalid field(s) '{field_names}'.".format(
@@ -346,9 +346,9 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
 
         arg_list_items.append("{arg_name}={arg_value!r}".format(arg_name=arg_name, arg_value=dict(arg_value)))
 
-        exec "{arg_name} = frozendict(arg_value)".format(arg_name=arg_name)
+        exec("{arg_name} = frozendict(arg_value)".format(arg_name=arg_name))
 
-    for field_name, factory in default_value_factories.iteritems():
+    for field_name, factory in default_value_factories.items():
         if not callable(factory):
             raise ValueError("Default value factory for '{field_name}' is not callable.".format(field_name=field_name))
 
@@ -379,7 +379,7 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
     # Code from here down copied verbatim from namedtuple
     #
     try:
-        exec class_definition in namespace
+        exec(class_definition, namespace)
     except SyntaxError as e:
         raise SyntaxError(e.message + ':\n' + class_definition)
     result = namespace[typename]
