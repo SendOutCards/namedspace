@@ -429,7 +429,7 @@ class {typename}(object):
     def __init__(self, **kwargs):
         self._field_value_storage = OrderedDict()
 
-        for field_name, field_value in kwargs.iteritems():
+        for field_name, field_value in list(kwargs.items()):
             if field_name in self._all_fields_set:
                 self._field_value_storage[field_name] = field_value
             else:
