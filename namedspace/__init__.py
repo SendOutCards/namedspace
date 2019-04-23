@@ -338,7 +338,7 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
         if not isinstance(arg_value, Mapping):
             raise ValueError("Value for argument '{arg_name}' must be a mapping.".format(arg_name=arg_name))
 
-        default_field_names = frozenset(iter(arg_value.keys()))
+        default_field_names = frozenset(iter(list(arg_value.keys())))
         if not default_field_names.issubset(all_fields_set):
             bad_default_field_names = default_field_names - all_fields_set
             raise ValueError("Value for argument '{arg_name}' contains invalid field(s) '{field_names}'.".format(
@@ -348,7 +348,7 @@ def namedspace(typename, required_fields=(), optional_fields=(), mutable_fields=
 
         exec("{arg_name} = frozendict(arg_value)".format(arg_name=arg_name))
 
-    for field_name, factory in default_value_factories.items():
+    for field_name, factory in list(default_value_factories.items()):
         if not callable(factory):
             raise ValueError("Default value factory for '{field_name}' is not callable.".format(field_name=field_name))
 
